@@ -116,7 +116,9 @@ Campaigns - IESCPE
                         Closed
                         {% endif %}
                     </td>
-                    <td>{{ campaign.assigned_to }}</td>
+                    <td>
+                        <a href="{{ url_for('profile', user=campaign.assigned_to) }}">{{ campaign.assignee.fullname }}</a>
+                    </td>
                     <td>
                         {% if campaign.flagged == 1 %}
                         <span class="flag">Flagged Inappropriate</span>

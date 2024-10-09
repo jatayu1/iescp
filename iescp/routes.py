@@ -487,7 +487,7 @@ def influencer_send_request():
                         campaign_id=campaign_id,
                         sent_to=campaign.created_by,
                         sent_by=current_user.id,
-                        payment_amount=campaign_id,
+                        payment_amount=form.payment.data,
                     )
                     db.session.add(new_ad_request)
                     db.session.commit()
