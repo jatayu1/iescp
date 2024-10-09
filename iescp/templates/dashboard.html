@@ -1,0 +1,621 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Dashboard - IESCPE
+{% endblock %}
+
+{% block dashboard_nav %}
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <i>Find</i>
+    </a>
+    <ul class="dropdown-menu">
+        <li>
+            <a href="{{ url_for('find_sponsors') }}" class="dropdown-item">Sponsors</a>
+        </li>
+        <li>
+            <a href="{{ url_for('find_influencer') }}" class="dropdown-item">Influencers</a>
+        </li>
+        <li>
+            <a href="{{ url_for('find_campaign') }}" class="dropdown-item">Campaigns</a>
+        </li>
+        {% if current_user.user_type == 0 %}
+        <li>
+            <a href="{{ url_for('find_ad_request') }}" class="dropdown-item">AD Requests</a>
+        </li>
+        {% endif %}
+    </ul>
+</li>
+{% if current_user.user_type == 2 %}
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('campaign_page') }}">Campaigns</a>
+</li>
+{% endif %}
+{% if current_user.user_type != 0 %}
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('stats') }}">Stats</a>
+</li>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+    <div class="row">
+        <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse shadow">
+            <div class="position-sticky pt-3">
+                <ul class="nav flex-column">
+                    {% if current_user.user_type == 0 %}
+                    <li class="nav-item dashboard-user-type">
+                        <strong>Admin</strong>
+                    </li>
+                    {% elif current_user.user_type == 1 %}
+                    <li class="nav-item dashboard-user-type">
+                        <strong>Influencer</strong>
+                    </li>
+                    {% elif current_user.user_type == 2 %}
+                    <li class="nav-item dashboard-user-type">
+                        <strong>Sponsor</strong>
+                    </li>
+                    {% endif %}
+                    <hr>
+                    {% if current_user.flagged == 1 %}
+                    <span class="flag">Flagged Inappropriate</span>
+                    <br>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{{ url_for('home_page') }}">
+                            <img src="{{ url_for('static', filename = './image/profile_pictures/'+current_user.profilePicture ) }}"
+                                class="img-thumbnail" alt="Iescp Influencer Profile Picture">
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <strong>Name : </strong>
+                        <span>{{ current_user.fullname }}</span>
+                    </li>
+
+                    <li class="nav-item">
+                        <strong>Email : </strong>
+                        <span>{{ current_user.email }}</span>
+                    </li>
+
+                    {% if current_user.user_type == 1 %}
+                    <li class="nav-item">
+                        <strong>Category : </strong>
+                        <span>{{ current_user.influencer.category }}</span>
+                    </li>
+
+                    <li class="nav-item">
+                        <strong>Niche : </strong>
+                        <span>{{ current_user.influencer.niche }}</span>
+                    </li>
+
+                    <li class="nav-item">
+                        <strong>Total Reach : </strong>
+                        <span>{{ reach }}</span>
+                    </li>
+                    {% elif current_user.user_type == 2 %}
+                    <li class="nav-item">
+                        <strong>industry : </strong>
+                        <span>{{ current_user.sponsor.industry }}</span>
+                    </li>
+                    {% endif %}
+                </ul>
+                <br>
+                {% if current_user.user_type == 1 %}
+                <!-- social media -->
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Social Media</th>
+                            <th scope="col">Followers</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- instagram -->
+                        <tr>
+                            <td><a href="{{ current_user.influencer.instagram_link }}"><i
+                                        class="bi bi-instagram"></i></a></td>
+                            <td>{{ current_user.influencer.instagram_followers }}</td>
+                        </tr>
+                        <!-- facebook -->
+                        <tr>
+                            <td><a href="{{ current_user.influencer.instagram_link }}"><i
+                                        class="bi bi-facebook"></i></a></td>
+                            <td>{{ current_user.influencer.facebook_followers }}</td>
+                        </tr>
+                        <!-- youtube -->
+                        <tr>
+                            <td><a href="{{ current_user.influencer.instagram_link }}"><i class="bi bi-youtube"></i></a>
+                            </td>
+                            <td>{{ current_user.influencer.youtube_followers }}</td>
+                        </tr>
+                        <!-- X -->
+                        <tr>
+                            <td><a href="{{ current_user.influencer.instagram_link }}"><i
+                                        class="bi bi-twitter-x"></i></a></td>
+                            <td>{{ current_user.influencer.X_followers }}</td>
+                        </tr>
+                        <tr>
+                            <td><a href="{{ current_user.influencer.instagram_link }}"><i
+                                        class="bi bi-linkedin"></i></a></td>
+                            <td>{{ current_user.influencer.linkedin_followers }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                {% endif %}
+            </div>
+        </nav>
+
+        {% if current_user.user_type == 0 %}
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 feed">
+            <div id="total-earning-chart" class="shadow">
+                <h3>Total Users: {{ user_count }}</h3>
+            </div>
+            <br>
+            <div class="container text-center">
+                <div class="row">
+                    <div class="col">
+                        <h3>Numarical Data</h3>
+                        <div class="charts shadow">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col"></th>
+                                        <th scope="col">Numbers</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th scope="row">Influencer</th>
+                                        <td>{{influencer_count}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Sponsors</th>
+                                        <td>{{sponsors_count}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Campaigns</th>
+                                        <td>{{campaign_count}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Active Ad Requests</th>
+                                        <td>{{ad_request_count}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Total Transaction</th>
+                                        <td>{{total_transaction}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <h3>Influencer Sponsors Split</h3>
+                        <div class="charts shadow">
+                            <canvas id="i-s-split"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col">
+                        <h3>User Registered over the Year</h3>
+                        <div style="height: 50vh;" class="charts shadow">
+                            <canvas id="uservsmonth"></canvas>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <h3>Flagged Influencers</h3>
+                        <div style="height: 50vh;" class="charts shadow">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Influencer</th>
+                                            <th scope="col">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if flagged_influencers %}
+                                        {% for influencer in flagged_influencers %}
+                                        <tr>
+                                            <td>
+                                                <a href="{{ url_for('profile', user=influencer.user.id) }}">{{ influencer.user.fullname }}</a>
+                                            </td>
+                                            <td> 
+                                                <a href="{{ url_for('unflag_profile', user=influencer.user.id) }}">Unflag</a> |
+                                                <a href="{{ url_for('admin_delete_profile', user=influencer.user.id) }}">Delete</a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                        {% else %}
+                                        <tr>
+                                            <td colspan="9">No flagged influencer available.</td>
+                                        </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col">
+                        <h3>Flagged Sponsors</h3>
+                        <div style="height: 50vh;" class="charts shadow">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Sponsors</th>
+                                            <th scope="col">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if flagged_sponsors %}
+                                        {% for sponsor in flagged_sponsors %}
+                                        <tr>
+                                            <td>
+                                                <a href="{{ url_for('profile', user=sponsor.user.id) }}">{{ sponsor.user.fullname }}</a>
+                                            </td>
+                                            <td> 
+                                                <a href="{{ url_for('unflag_profile', user=sponsor.user.id) }}">Unflag</a> |
+                                                <a href="{{ url_for('admin_delete_profile', user=sponsor.user.id) }}">Delete</a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                        {% else %}
+                                        <tr>
+                                            <td colspan="9">No flagged sponsor available.</td>
+                                        </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <h3>Flagged Campaigns</h3>
+                        <div style="height: 50vh;" class="charts shadow">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Campaigns</th>
+                                            <th scope="col">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if flagged_campaigns %}
+                                        {% for campaign in flagged_campaigns %}
+                                        <tr>
+                                            <td>
+                                                <a href="{{ url_for('view_campaign', campaign=campaign.id) }}">{{ campaign.name }}</a>
+                                            </td>
+                                            <td> 
+                                                <a href="{{ url_for('unflag_campaign', campaign=campaign.id) }}">Unflag</a> |
+                                                <a href="{{ url_for('delete_campaign', campaign=campaign.id) }}">Delete</a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                        {% else %}
+                                        <tr>
+                                            <td colspan="9">No flagged campaign available.</td>
+                                        </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col">
+                        <h3>Flagged Ad Requests</h3>
+                        <div style="height: 50vh;" class="charts shadow">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Sender</th>
+                                            <th scope="col">Reciver</th>
+                                            <th scope="col">Campaign</th>
+                                            <th scope="col">Budget</th>
+                                            <th scope="col">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if flagged_ad_requests %}
+                                        {% for request in flagged_ad_requests %}
+                                        <tr>
+                                            <td>
+                                                <a href="{{ url_for('profile', user=request.sent_by_user.id ) }}">{{ request.sent_by_user.fullname }}</a>
+                                            </td>
+                                            <td>
+                                                <a href="{{ url_for('profile', user=request.sent_to_user.id ) }}">{{ request.sent_to_user.fullname }}</a>
+                                            </td>
+                                            <td>
+                                                <a href="{{ url_for('view_campaign', campaign=request.campaign.id ) }}">{{ request.campaign.name }}</a>
+                                            </td>
+                                            <td>
+                                                {{ request.payment_amount }}
+                                            </td>
+                                            <td> 
+                                                <a href="{{ url_for('unflag_requests', request=request.id ) }}">Unflag</a> |
+                                                <a href="{{ url_for('del_req', req=request.id ) }}">Delete</a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                        {% else %}
+                                        <tr>
+                                            <td colspan="9">No flagged Ad Request available.</td>
+                                        </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br>
+            </div>
+        </main>
+        {% else %}
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 feed">
+            <h1 class="h2 dashboard-heading">Active Campaigns</h1>
+            <div class="table-responsive">
+                <table class="table table-striped table-sm">
+                    <thead>
+                        <tr>
+                            <th scope="col">Campaign</th>
+                            <th scope="col">Discription</th>
+                            <th scope="col">Start Date</th>
+                            <th scope="col">End Date</th>
+                            <th scope="col">Budget</th>
+                            <th scope="col">Visibility</th>
+
+                            {% if current_user.user_type == 1 %}
+                            <th scope="col">Sponsored By</th>
+                            {% elif current_user.user_type == 2 %}
+                            <th scope="col">Assigned to</th>
+                            {% endif %}
+
+                            <th scope="col">Flag</th>
+                            {% if current_user.user_type == 2 %}
+                            <th scope="col">Action</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if current_user.user_type == 1 %}
+                        {% set campaigns = current_user.get_active_campaign_for_influencer() %}
+                        {% if campaigns %}
+                        {% for campaign in campaigns %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('view_campaign', campaign=campaign.id) }}">{{campaign.name }}</a>
+                            </td>
+                            <td>{{ campaign.description }}</td>
+                            <td>{{ campaign.start_date }}</td>
+                            <td>{{ campaign.end_date }}</td>
+                            <td>{{ campaign.budget }}</td>
+                            <td>
+                                {% if campaign.visibility == 0 %}
+                                Public
+                                {% else %}
+                                Private
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ url_for('profile', user=campaign.created_by ) }}">{{campaign.creater.fullname }}</a>
+                            </td>
+                            <!-- Flag -->
+                            <td>
+                                {% if campaign.flagged == 1 %}
+                                <span class="flag">Flagged Inappropriate</span>
+                                {% endif %}                            
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="9">No Active campaigns available.</td>
+                        </tr>
+                        {% endif %}
+                        {% elif current_user.user_type == 2 %}
+                        {% set campaigns = current_user.get_active_campaign_for_sponsors() %}
+                        {% if campaigns %}
+                        {% for campaign in campaigns %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('view_campaign', campaign=campaign.id) }}">{{ campaign.name }}</a>
+                            </td>
+                            <td>{{ campaign.description }}</td>
+                            <td>{{ campaign.start_date }}</td>
+                            <td>{{ campaign.end_date }}</td>
+                            <td>{{ campaign.budget }}</td>
+                            <td>
+                                {% if campaign.visibility == 0 %}
+                                Public
+                                {% else %}
+                                Private
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ url_for('profile', user=campaign.assignee.id ) }}">{{campaign.assignee.fullname }}</a>
+                            </td>
+                            <!-- Flag -->
+                            <td>
+                                {% if campaign.flagged == 1 %}
+                                <span class="flag">Flagged Inappropriate</span>
+                                {% endif %}
+                            </td>
+                            <td> <a href="{{ url_for('mark_complete_campaign', campaign=campaign.id) }}">Mark Complete</a></td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="9">No Active campaigns available.</td>
+                        </tr>
+                        {% endif %}
+                        {% endif %}
+
+                    </tbody>
+                </table>
+            </div>
+            <hr>
+            <h2 class="dashboard-heading">Ad Requests (Sent)</h2>
+            <div class="table-responsive">
+                <table class="table table-striped table-sm">
+                    <thead>
+                        <tr>
+                            <th scope="col">Campaign</th>
+                            <th scope="col">Sent To</th>
+                            <th scope="col">Payment Amount</th>
+                            <th scope="col">Flag</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% set send_ad_reqs = current_user.get_sent_ad_request() %}
+                        {% if send_ad_reqs %}
+                        {% for ad_req in send_ad_reqs %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('view_campaign', campaign=ad_req.campaign_id) }}">{{
+                                    ad_req.campaign.name }}</a>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('profile', user=ad_req.sent_to ) }}">{{ ad_req.sent_to_user.fullname
+                                    }}</a>
+                            </td>
+                            <td>{{ ad_req.payment_amount }}</td>
+                            <!-- Flag -->
+                            <td>
+                                {% if ad_req.flagged == 1 %}
+                                <span class="flag">Flagged Inappropriate</span>
+                                {% endif %}                            
+                            </td>
+                            <td>
+                                <a href="{{ url_for('del_req', req=ad_req.id) }}">Delete</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="9">No campaigns available.</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+            <hr>
+            <h2 class="dashboard-heading">Ad Requests (Recived)</h2>
+            <div class="table-responsive">
+                <table class="table table-striped table-sm">
+                    <thead>
+                        <tr>
+                            <th scope="col">Campaign</th>
+                            <th scope="col">Sent By</th>
+                            <th scope="col">Payment Amount</th>
+                            <th scope="col">Flag</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% set send_ad_reqs = current_user.get_recived_ad_request() %}
+                        {% if send_ad_reqs %}
+                        {% for ad_req in send_ad_reqs %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('view_campaign', campaign=ad_req.campaign_id) }}">{{
+                                    ad_req.campaign.name }}</a>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('profile', user=ad_req.sent_by) }}">{{ ad_req.sent_by_user.fullname
+                                    }}</a>
+                            </td>
+                            <td>{{ ad_req.payment_amount }}</td>
+                            <!-- Flag -->
+                            <td>
+                                {% if ad_req.flagged == 1 %}
+                                <span class="flag">Flagged Inappropriate</span>
+                                {% endif %}                            
+                            </td>
+                            <td>
+                                <a href="{{ url_for('view_campaign', campaign=ad_req.campaign_id) }}">View</a> |
+                                <a href="{{ url_for('accept_req', adreq=ad_req.id) }}">Accept</a> |
+                                <a href="{{ url_for('negotiate', adreq=ad_req.id) }}">Negotiate</a> |
+                                <a href="{{ url_for('del_req', req=ad_req.id) }}">Reject</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="9">No campaigns available.</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </main>
+        {% endif %}
+    </div>
+</div>
+{% if current_user.user_type == 0 %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Earning V/S Campaigns 
+    const labels = ["Influencer", "Sponsors"];
+
+    const data = {
+        labels: labels,
+        datasets: [{
+            label: ["Influencer", "Sponsors"],
+            backgroundColor: ['rgb(225, 175, 209)', 'rgb(173, 136, 198)'],
+            borderColor: ['rgb(225, 175, 209)', 'rgb(173, 136, 198)'],
+            data: [{{ influencer_count | tojson}}, {{ sponsors_count | tojson}}],
+        }]
+    };
+
+    const config = {
+        type: 'pie',
+        data: data,
+        options: { maintainAspectRatio: false }
+    };
+
+    const myChart = new Chart(
+        document.getElementById('i-s-split').getContext('2d'),
+        config
+    );
+
+    // registration V/S Month 
+    const month_labels = {{ month_labels | tojson}};
+
+    const month_data = {
+        labels: month_labels,
+        datasets: [{
+            label: 'registration V/S Month',
+            backgroundColor: 'rgb(116, 105, 182)',
+            borderColor: 'rgb(116, 105, 182)',
+            data: {{ month_data | tojson}},
+        }]
+    };
+
+    const month_config = {
+        type: 'line',
+        data: month_data,
+        options: { maintainAspectRatio: false }
+    };
+
+    const year_myChart = new Chart(
+        document.getElementById('uservsmonth').getContext('2d'),
+        month_config
+    );
+</script>
+{% endif %}
+{% endblock %}

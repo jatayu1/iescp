@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Campaign - IESCPE
+{% endblock %}
+
+{% block dashboard_nav %}
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <i>Find</i>
+    </a>
+    <ul class="dropdown-menu">
+        <li>
+            <a href="{{ url_for('find_sponsors') }}" class="dropdown-item">Sponsors</a>
+        </li>
+        <li>
+            <a href="{{ url_for('find_influencer') }}" class="dropdown-item">Influencers</a>
+        </li>
+        <li>
+            <a href="{{ url_for('find_campaign') }}" class="dropdown-item">Campaigns</a>
+        </li>
+        {% if current_user.user_type == 0 %}
+        <li>
+            <a href="{{ url_for('find_ad_request') }}" class="dropdown-item">AD Requests</a>
+        </li>
+        {% endif %}
+    </ul>
+</li>
+{% if current_user.user_type == 2 %}
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('campaign_page') }}">Campaigns</a>
+</li>
+{% endif %}
+{% if current_user.user_type != 0 %}
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('stats') }}">Stats</a>
+</li>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="form shadow add-campaign">
+    <h3 class="form-heading">Campaign</h3>
+    <div class="container">
+        {% if campaign.flagged == 1 %}
+        <span class="flag">Flagged Inappropriate</span>
+        <br><br>
+        {% endif %}
+        <div>
+            <strong>Name :</strong>
+            <span>{{ campaign.name }}</span>
+        </div>
+        <div>
+            <strong>Description :</strong>
+            <span>{{ campaign.description }}</span>
+        </div>
+        <div>
+            <strong>start_date :</strong>
+            <span>{{ campaign.start_date }}</span>
+        </div>
+        <div>
+            <strong>end_date :</strong>
+            <span>{{ campaign.end_date }}</span>
+        </div>
+        <div>
+            <strong>created_by :</strong>
+            <span><a href="{{ url_for('profile', user=campaign.creater.id) }}">{{ campaign.creater.fullname }}</a></span>
+        </div>
+    </div>
+</div>
+{% endblock %}

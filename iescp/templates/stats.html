@@ -1,0 +1,294 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Stats - IESCPE
+{% endblock %}
+
+{% block dashboard_nav %}
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <i>Find</i>
+    </a>
+    <ul class="dropdown-menu">
+        <li>
+            <a href="{{ url_for('find_sponsors') }}" class="dropdown-item">Sponsors</a>
+        </li>
+        <li>
+            <a href="{{ url_for('find_influencer') }}" class="dropdown-item">Influencers</a>
+        </li>
+        <li>
+            <a href="{{ url_for('find_campaign') }}" class="dropdown-item">Campaigns</a>
+        </li>
+        {% if current_user.user_type == 0 %}
+        <li>
+            <a href="{{ url_for('find_ad_request') }}" class="dropdown-item">AD Requests</a>
+        </li>
+        {% endif %}
+    </ul>
+</li>
+{% if current_user.user_type == 2 %}
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('campaign_page') }}">Campaigns</a>
+</li>
+{% endif %}
+{% if current_user.user_type != 0 %}
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('stats') }}">Stats</a>
+</li>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+    <div class="row">
+        <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse shadow">
+            <div class="position-sticky pt-3">
+                <ul class="nav flex-column">
+                    {% if current_user.user_type == 0 %}
+                    <li class="nav-item dashboard-user-type">
+                        <strong>Admin</strong>
+                    </li>
+                    {% elif current_user.user_type == 1 %}
+                    <li class="nav-item dashboard-user-type">
+                        <strong>Influencer</strong>
+                    </li>
+                    {% elif current_user.user_type == 2 %}
+                    <li class="nav-item dashboard-user-type">
+                        <strong>Sponsor</strong>
+                    </li>
+                    {% endif %}
+                    <hr>
+                    {% if current_user.flagged == 1 %}
+                    <span class="flag">Flag Inappropriate</span>
+                    <br>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{{ url_for('home_page') }}">
+                            <img src="{{ url_for('static', filename = './image/profile_pictures/'+current_user.profilePicture ) }}"
+                                class="img-thumbnail" alt="Iescp Influencer Profile Picture">
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <strong>Name : </strong>
+                        <span>{{ current_user.fullname }}</span>
+                    </li>
+
+                    <li class="nav-item">
+                        <strong>Email : </strong>
+                        <span>{{ current_user.email }}</span>
+                    </li>
+
+                    {% if current_user.user_type == 1 %}
+                    <li class="nav-item">
+                        <strong>Category : </strong>
+                        <span>{{ current_user.influencer.category }}</span>
+                    </li>
+
+                    <li class="nav-item">
+                        <strong>Niche : </strong>
+                        <span>{{ current_user.influencer.niche }}</span>
+                    </li>
+
+                    <li class="nav-item">
+                        <strong>Total Reach : </strong>
+                        <span>{{ reach }}</span>
+                    </li>
+                    {% elif current_user.user_type == 2 %}
+                    <li class="nav-item">
+                        <strong>industry : </strong>
+                        <span>{{ current_user.sponsor.industry }}</span>
+                    </li>
+                    {% endif %}
+                </ul>
+                <br>
+                {% if current_user.user_type == 1 %}
+                <!-- social media -->
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Social Media</th>
+                            <th scope="col">Followers</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- instagram -->
+                        <tr>
+                            <td><a href="{{ current_user.influencer.instagram_link }}"><i
+                                        class="bi bi-instagram"></i></a></td>
+                            <td>{{ current_user.influencer.instagram_followers }}</td>
+                        </tr>
+                        <!-- facebook -->
+                        <tr>
+                            <td><a href="{{ current_user.influencer.instagram_link }}"><i
+                                        class="bi bi-facebook"></i></a></td>
+                            <td>{{ current_user.influencer.facebook_followers }}</td>
+                        </tr>
+                        <!-- youtube -->
+                        <tr>
+                            <td><a href="{{ current_user.influencer.instagram_link }}"><i class="bi bi-youtube"></i></a>
+                            </td>
+                            <td>{{ current_user.influencer.youtube_followers }}</td>
+                        </tr>
+                        <!-- X -->
+                        <tr>
+                            <td><a href="{{ current_user.influencer.instagram_link }}"><i
+                                        class="bi bi-twitter-x"></i></a></td>
+                            <td>{{ current_user.influencer.X_followers }}</td>
+                        </tr>
+                        <tr>
+                            <td><a href="{{ current_user.influencer.instagram_link }}"><i
+                                        class="bi bi-linkedin"></i></a></td>
+                            <td>{{ current_user.influencer.linkedin_followers }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                {% endif %}
+            </div>
+        </nav>
+
+        {% if current_user.user_type == 0 %}
+        {% elif current_user.user_type == 1 %}
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 feed">
+            <div id="total-earning-chart" class="shadow">
+                <h3>Total Earnings: {{ total_earning }}</h3>
+            </div>
+            <br>
+            <div class="container text-center">
+                <div class="row">
+                    <div class="col">
+                        <h3>Top 10 Campaigns</h3>
+                        <div class="charts shadow">
+                            <canvas id="earnvscamp"></canvas>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <h3>Campaigns done this month</h3>
+                        <div class="charts shadow">
+                            <canvas id="monthvscamp"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col">
+                        <h3>Campaigns done this year</h3>
+                        <div style="height: 50vh;" class="charts shadow">
+                            <canvas id="yearvscamp"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        {% elif current_user.user_type == 2 %}
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 feed">
+            <div id="total-earning-chart" class="shadow">
+                <h3>Total Expenditure: {{ total_expenditure }}</h3>
+            </div>
+            <br>
+            <div class="container text-center">
+                <div class="row">
+                    <div class="col">
+                        <h3>Top 10 Campaigns Expenditure</h3>
+                        <div class="charts shadow">
+                            <canvas id="earnvscamp"></canvas>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <h3>Campaigns done this month</h3>
+                        <div class="charts shadow">
+                            <canvas id="monthvscamp"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col">
+                        <h3>Campaigns done this year</h3>
+                        <div style="height: 50vh;" class="charts shadow">
+                            <canvas id="yearvscamp"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        {% endif %}
+
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Earning V/S Campaigns 
+    const labels = {{ labels | tojson}};
+
+    const data = {
+        labels: labels,
+        datasets: [{
+            label: {{ ernvscamp | tojson}},
+            backgroundColor: 'rgb(116, 105, 182)',
+            borderColor: 'rgb(116, 105, 182)',
+            data: {{ data | tojson}},
+        }]
+    };
+
+    const config = {
+        type: 'bar',
+        data: data,
+        options: { maintainAspectRatio: false }
+    };
+
+    const myChart = new Chart(
+        document.getElementById('earnvscamp').getContext('2d'),
+        config
+    );
+
+    // Month V/S Campaigns
+    const month_labels = {{ month_labels | tojson}};
+
+    const month_data = {
+        labels: month_labels,
+        datasets: [{
+            label: 'Month V/S Number of campaigns',
+            backgroundColor: 'rgb(116, 105, 182)',
+            borderColor: 'rgb(116, 105, 182)',
+            data: {{ month_data | tojson}},
+        }]
+    };
+
+    const month_config = {
+        type: 'line',
+        data: month_data,
+        options: { maintainAspectRatio: false }
+    };
+
+    const month_myChart = new Chart(
+        document.getElementById('monthvscamp').getContext('2d'),
+        month_config
+    );
+
+    // Month V/S Year
+    const year_labels = {{ year_labels | tojson}};
+
+    const year_data = {
+        labels: year_labels,
+        datasets: [{
+            label: 'Year V/S Number of campaigns',
+            backgroundColor: 'rgb(116, 105, 182)',
+            borderColor: 'rgb(116, 105, 182)',
+            data: {{ year_data | tojson}},
+        }]
+    };
+
+    const year_config = {
+        type: 'line',
+        data: year_data,
+        options: { maintainAspectRatio: false }
+    };
+
+    const year_myChart = new Chart(
+        document.getElementById('yearvscamp').getContext('2d'),
+        year_config
+    );
+</script>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Edit Campaigns - IESCPE
+{% endblock %}
+
+{% block dashboard_nav %}
+
+{% if current_user.user_type == 2 %}
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('campaign_page') }}">Campaigns</a>
+</li>
+{% endif %}
+{% if current_user.user_type != 0 %}
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('stats') }}">Stats</a>
+</li>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="form shadow add-campaign">
+    <h3 class="form-heading">Edit campaign - {{campaign.name}}</h3>
+    <form method="POST" id="edit-campaign-form">
+        {{ form.hidden_tag() }}
+        <div class="mb-3 iescpe-form-field">
+            {{ form.name.label }}
+            {{ form.name(class="form-control", placeholder="Campaign Name", value=campaign.name) }}
+        </div>
+        <div class="mb-3 iescpe-form-field">
+            {{ form.description.label }}
+            <textarea id="description" class="form-control" name="description" placeholder="Campaign Description" required>{{ campaign.description }}</textarea>
+        </div>
+        <div class="mb-3 iescpe-form-field">
+            {{ form.start_date.label }}
+            {{ form.start_date(class="form-control", placeholder="Campaign Start Date", value=campaign.start_date) }}
+        </div>
+        <div class="mb-3 iescpe-form-field">
+            {{ form.end_date.label }}
+            {{ form.end_date(class="form-control", placeholder="Campaign End Date", value=campaign.end_date) }}
+        </div>
+        <div class="mb-3 iescpe-form-visibility">
+            {{ form.visibility.label }}
+            {{ form.visibility(class="form-control", placeholder="Visibility", default=campaign.visibility) }}
+        </div>
+        <div class="d-grid gap-2 iescpe-form-field" id="campaign-form-submit">
+            {{ form.submit(class = "btn btn-1") }}
+        </div>
+    </form>
+</div>
+{% endblock %}

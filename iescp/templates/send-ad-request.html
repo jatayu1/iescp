@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Ad Request - IESCPE
+{% endblock %}
+
+{% block dashboard_nav %}
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <i>Find</i>
+    </a>
+    <ul class="dropdown-menu">
+        <li>
+            <a href="{{ url_for('find_sponsors') }}" class="dropdown-item">Sponsors</a>
+        </li>
+        <li>
+            <a href="{{ url_for('find_influencer') }}" class="dropdown-item">Influencers</a>
+        </li>
+        <li>
+            <a href="{{ url_for('find_campaign') }}" class="dropdown-item">Campaigns</a>
+        </li>
+        {% if current_user.user_type == 0 %}
+        <li>
+            <a href="{{ url_for('find_ad_request') }}" class="dropdown-item">AD Requests</a>
+        </li>
+        {% endif %}
+    </ul>
+</li>
+{% if current_user.user_type == 2 %}
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('campaign_page') }}">Campaigns</a>
+</li>
+{% endif %}
+{% if current_user.user_type != 0 %}
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('stats') }}">Stats</a>
+</li>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="form shadow add-campaign">
+    <h3 class="form-heading">Send Ad Request</h3>
+    <form method="POST" id="login-form">
+        {{ form.hidden_tag() }}
+        <div class="mb-3 iescpe-form-field">
+            {{ form.payment.label }}
+            {{ form.payment(class="form-control", placeholder="Payment") }}
+        </div>
+        <div class="mb-3 iescpe-form-field">
+            {{ form.send_to.label }}
+            {{ form.send_to(class="form-control", placeholder="Send To") }}
+        </div>
+        <div class="mb-3 iescpe-form-field" style="display: none;">
+            {{ form.campaign_id(class="form-control", placeholder="Campaign Id", value=campaign_id) }}
+        </div>
+        <div class="mb-3 iescpe-form-field" style="display: none;">
+            {{ form.sent_by(class="form-control", placeholder="Send By", value=current_user.id) }}
+        </div>
+
+        <div class="d-grid gap-2 iescpe-form-field" id="campaign-form-submit">
+            {{ form.submit(class = "btn btn-1") }}
+        </div>
+    </form>
+</div>
+{% endblock %}

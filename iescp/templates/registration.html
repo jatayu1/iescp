@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Registration - IESCPE
+{% endblock %}
+
+{% block nav %}
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('login_page') }}">Sign In</a>
+</li>
+{% endblock %}
+
+{% block content %}
+<section class="login" id="login">
+    <div class="login-text messages">
+        <h1>IESCPE</h1>
+        <h5>It's a platform to connect Sponsors and Influencers so that sponsors can get their product/service
+            advertised and influencers can get monetary benefit.</h5>
+    </div>
+    <div class="login-text form shadow">
+        <h3 class="form-heading">Create an account</h3>
+        <form method="POST" enctype="multipart/form-data" id="reg-form">
+            {{ form.hidden_tag() }}
+            <!-- User Type -->
+            <div class="mb-3 iescpe-form-user-type">
+                {{ form.user_type(class="form-control") }}
+            </div>
+            <!-- Fullname -->
+            <div class="mb-3 iescpe-form-field">
+                {{ form.fullname(class="form-control", placeholder="Full Name") }}
+            </div>
+            <!-- Username -->
+            <div class="mb-3 iescpe-form-field">
+                {{ form.username(class="form-control", placeholder="Username") }}
+            </div>
+            <!-- Email -->
+            <div class="mb-3 iescpe-form-field">
+                {{ form.email(class="form-control", placeholder="Email Address") }}
+            </div>
+            <!-- Password -->
+            <div class="mb-3 iescpe-form-field">
+                {{ form.password1(class="form-control", placeholder="Password") }}
+            </div>
+            <!-- Confirm Password -->
+            <div class="mb-3 iescpe-form-field">
+                {{ form.password2(class="form-control", placeholder="Confirm Password") }}
+            </div>
+            <!-- Profile Picture -->
+            <div class="mb-3 iescpe-form-field">
+                {{ form.profile_picture.label }}
+                {{ form.profile_picture(class="form-control") }}
+            </div>
+            <!-- Submit Button -->
+            <div class="d-grid gap-2" id="reg-form-submit">
+                {{ form.submit(class = "btn btn-1") }}
+            </div>
+            <hr>
+            <div class="d-grid gap-2">
+                <a href="{{ url_for('login_page') }}" class="btn btn-primary" id="reg-form-login">Already have an account</a>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

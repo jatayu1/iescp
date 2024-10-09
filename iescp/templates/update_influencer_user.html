@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Update Profile - IESCPE
+{% endblock %}
+
+{% block dashboard_nav %}
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <i>Find</i>
+    </a>
+    <ul class="dropdown-menu">
+        <li>
+            <a href="{{ url_for('find_sponsors') }}" class="dropdown-item">Sponsors</a>
+        </li>
+        <li>
+            <a href="{{ url_for('find_influencer') }}" class="dropdown-item">Influencers</a>
+        </li>
+        <li>
+            <a href="{{ url_for('find_campaign') }}" class="dropdown-item">Campaigns</a>
+        </li>
+        {% if current_user.user_type == 0 %}
+        <li>
+            <a href="{{ url_for('find_ad_request') }}" class="dropdown-item">AD Requests</a>
+        </li>
+        {% endif %}
+    </ul>
+</li>
+{% if current_user.user_type == 2 %}
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('campaign_page') }}">Campaigns</a>
+</li>
+{% endif %}
+{% if current_user.user_type != 0 %}
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('stats') }}">Stats</a>
+</li>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="form shadow add-campaign">
+    <h3 class="form-heading">Update Your Profile</h3>
+    <form method="POST" enctype="multipart/form-data" id="update_influencer_user">
+        {{ form.hidden_tag() }}
+        <!-- Full Name -->
+        <div class="mb-3 iescpe-form-field">
+            {{ form.fullname.label }}
+            {{ form.fullname(class="form-control", placeholder="fullname", value = current_user.fullname) }}
+        </div>
+        <!-- Email -->
+        <div class="mb-3 iescpe-form-field">
+            {{ form.email.label }}
+            {{ form.email(class="form-control", placeholder="Email Address", value = current_user.email) }}
+        </div>
+        <!-- Profile Picture -->
+        <div class="mb-3 iescpe-form-field">
+            {{ form.profile_picture.label }}
+            {{ form.profile_picture(class="form-control") }}
+        </div>
+
+        <div class="mb-3 iescpe-form-field">
+            {{ form.category.label }}
+            {{ form.category(class="form-control", placeholder="category", value = current_user.influencer.category if current_user.influencer.category else "") }}
+        </div>
+        <div class="mb-3 iescpe-form-field">
+            {{ form.niche.label }}
+            {{ form.niche(class="form-control", placeholder="niche", value = current_user.influencer.niche if current_user.influencer.niche else "") }}
+        </div>
+        <!-- social media -->
+        <h3 class="form-heading">Social Media</h3>
+        <!-- Instagram -->
+        <div class="mb-3 iescpe-form-field">
+            {{ form.ig_link.label }}
+            {{ form.ig_link(class="form-control", placeholder="Instagram Profile Link", value = current_user.influencer.instagram_link if current_user.influencer.instagram_link else "") }}
+        </div>
+        <div class="mb-3 iescpe-form-field">
+            {{ form.ig_follower.label }}
+            {{ form.ig_follower(class="form-control", placeholder="Number of Instagram Followers", value = current_user.influencer.instagram_followers if current_user.influencer.instagram_followers else "") }}
+        </div>
+        <!-- Facebook -->
+        <div class="mb-3 iescpe-form-field">
+            {{ form.fb_link.label }}
+            {{ form.fb_link(class="form-control", placeholder="Facebook Profile Link", value = current_user.influencer.facebook_link if current_user.influencer.facebook_link else "") }}
+        </div>
+        <div class="mb-3 iescpe-form-field">
+            {{ form.fb_follower.label }}
+            {{ form.fb_follower(class="form-control", placeholder="Number of Facebook Followers", value = current_user.influencer.facebook_followers if current_user.influencer.facebook_followers else "") }}
+        </div>
+        <!-- Youtube -->
+        <div class="mb-3 iescpe-form-field">
+            {{ form.yt_link.label }}
+            {{ form.yt_link(class="form-control", placeholder="YouTube Profile Link", value = current_user.influencer.youtube_link if current_user.influencer.youtube_link else "") }}
+        </div>
+        <div class="mb-3 iescpe-form-field">
+            {{ form.yt_follower.label }}
+            {{ form.yt_follower(class="form-control", placeholder="Number of YouTube Followers", value = current_user.influencer.youtube_followers if current_user.influencer.youtube_followers else "") }}
+        </div>
+        <!-- X -->
+        <div class="mb-3 iescpe-form-field">
+            {{ form.x_link.label }}
+            {{ form.x_link(class="form-control", placeholder="X Profile Link", value = current_user.influencer.X_link if current_user.influencer.X_link else "") }}
+        </div>
+        <div class="mb-3 iescpe-form-field">
+            {{ form.x_follower.label }}
+            {{ form.x_follower(class="form-control", placeholder="Number of X Followers", value = current_user.influencer.X_followers if current_user.influencer.X_followers else "") }}
+        </div>
+        <!-- Linked In -->
+        <div class="mb-3 iescpe-form-field">
+            {{ form.lin_link.label }}
+            {{ form.lin_link(class="form-control", placeholder="LinkedIn Profile Link", value = current_user.influencer.linkedin_link if current_user.influencer.linkedin_link else "") }}
+        </div>
+        <div class="mb-3 iescpe-form-field">
+            {{ form.lin_follower.label }}
+            {{ form.lin_follower(class="form-control", placeholder="Number of LinkedIn Followers", value = current_user.influencer.linkedin_followers if current_user.influencer.linkedin_followers else "") }}
+        </div>
+        <!-- Submit Button -->
+        <div class="d-grid gap-2" id="reg-form-submit">
+            {{ form.submit(class = "btn btn-1") }}
+        </div>
+    </form>
+    <br>
+    <!-- delete Profile -->
+    <a type="button" class="btn btn-danger" href="{{ url_for('delete_profile') }}">Delete Profile</a>
+</div>
+{% endblock %}

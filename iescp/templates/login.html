@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Login - IESCPE
+{% endblock %}
+
+{% block nav %}
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('register_page') }}">Sign Up</a>
+</li>
+{% endblock %}
+
+{% block content %}
+<section class="login" id="login">
+    <div class="login-text messages">
+        <h1>IESCPE</h1>
+        <h5>It's a platform to connect Sponsors and Influencers so that sponsors can get their product/service
+            advertised and influencers can get monetary benefit.</h5>
+    </div>
+    <div class="login-text form shadow">
+        <h3 class="form-heading">Login here</h3>
+        <form method="POST" id="login-form">
+            {{ form.hidden_tag() }}
+            <div class="mb-3 iescpe-form-field">
+                {{ form.username.label }}
+                {{ form.username(class="form-control", placeholder="Username") }}
+            </div>
+            <div class="mb-3 iescpe-form-field">
+                {{ form.password.label }}
+                {{ form.password(class="form-control", placeholder="Password") }}
+            </div>
+            <div class="d-grid gap-2 iescpe-form-field" id="login-form-submit">
+                {{ form.submit(class = "btn btn-1") }}
+            </div>
+            <hr>
+            <div class="d-grid gap-2">
+                <a href="{{ url_for('register_page') }}" class="btn btn-primary" id="login-form-reg">Create an account</a>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

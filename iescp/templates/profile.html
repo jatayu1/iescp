@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Profile - IESCPE
+{% endblock %}
+
+{% block dashboard_nav %}
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <i>Find</i>
+    </a>
+    <ul class="dropdown-menu">
+        <li>
+            <a href="{{ url_for('find_sponsors') }}" class="dropdown-item">Sponsors</a>
+        </li>
+        <li>
+            <a href="{{ url_for('find_influencer') }}" class="dropdown-item">Influencers</a>
+        </li>
+        <li>
+            <a href="{{ url_for('find_campaign') }}" class="dropdown-item">Campaigns</a>
+        </li>
+        {% if current_user.user_type == 0 %}
+        <li>
+            <a href="{{ url_for('find_ad_request') }}" class="dropdown-item">AD Requests</a>
+        </li>
+        {% endif %}
+    </ul>
+</li>
+{% if current_user.user_type == 2 %}
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('campaign_page') }}">Campaigns</a>
+</li>
+{% endif %}
+{% if current_user.user_type != 0 %}
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('stats') }}">Stats</a>
+</li>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="form shadow add-campaign">
+    <h3 class="form-heading">Profile</h3>
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <img src="{{ url_for('static', filename = './image/profile_pictures/'+user.profilePicture ) }}"
+                    class="img-thumbnail" alt="Iescp Influencer Profile Picture" style="width: 400px; height: 400px">
+            </div>
+            <div class="col">
+                {% if user.flagged == 1 %}
+                <span class="flag">Flagged Inappropriate</span>
+                <br>
+                {% endif %}
+                <div>
+                    <strong>Name :</strong>
+                    <span>{{ user.fullname }}</span>
+                </div>
+                <div>
+                    <strong>email :</strong>
+                    <span>{{ user.email }}</span>
+                </div>
+                {% if user.user_type == 1 %}
+                <div>
+                    <strong>Category :</strong>
+                    <span>{{ user.influencer.category }}</span>
+                </div>
+                <div>
+                    <strong>Niche :</strong>
+                    <span>{{ user.influencer.niche }}</span>
+                </div>
+                <div>
+                    <strong>Total Reach :</strong>
+                    <span>{{ reach }}</span>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Social Media</th>
+                            <th scope="col">Followerssss</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- instagram -->
+                        <tr>
+                            <td><a href="{{ user.influencer.instagram_link }}"><i class="bi bi-instagram"></i></a></td>
+                            <td>{{ user.influencer.instagram_followers }}</td>
+                        </tr>
+                        <!-- facebook -->
+                        <tr>
+                            <td><a href="{{ user.influencer.instagram_link }}"><i class="bi bi-facebook"></i></a></td>
+                            <td>{{ user.influencer.facebook_followers }}</td>
+                        </tr>
+                        <!-- youtube -->
+                        <tr>
+                            <td><a href="{{ user.influencer.instagram_link }}"><i class="bi bi-youtube"></i></a></td>
+                            <td>{{ user.influencer.youtube_followers }}</td>
+                        </tr>
+                        <!-- X -->
+                        <tr>
+                            <td><a href="{{ user.influencer.instagram_link }}"><i class="bi bi-twitter-x"></i></a></td>
+                            <td>{{ user.influencer.X_followers }}</td>
+                        </tr>
+                        <tr>
+                            <td><a href="{{ user.influencer.instagram_link }}"><i class="bi bi-linkedin"></i></a></td>
+                            <td>{{ user.influencer.linkedin_followers }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                {% elif user.user_type == 2 %}
+                <div>
+                    <strong>industry :</strong>
+                    <span>{{ user.sponsor.industry }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Campaigns - IESCPE
+{% endblock %}
+
+{% block dashboard_nav %}
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <i>Find</i>
+    </a>
+    <ul class="dropdown-menu">
+        <li>
+            <a href="{{ url_for('find_sponsors') }}" class="dropdown-item">Sponsors</a>
+        </li>
+        <li>
+            <a href="{{ url_for('find_influencer') }}" class="dropdown-item">Influencers</a>
+        </li>
+        <li>
+            <a href="{{ url_for('find_campaign') }}" class="dropdown-item">Campaigns</a>
+        </li>
+        {% if current_user.user_type == 0 %}
+        <li>
+            <a href="{{ url_for('find_ad_request') }}" class="dropdown-item">AD Requests</a>
+        </li>
+        {% endif %}
+    </ul>
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="form shadow add-campaign">
+    <h3 class="form-heading">Filter Ad Requests</h3>
+    <form method="POST" id="">
+        {{ form.hidden_tag() }}
+        <div class="mb-3 iescpe-form-field">
+            {{ form.sender.label }}
+            {{ form.sender(class="form-control") }}
+        </div>
+        <div class="mb-3 iescpe-form-field">
+            {{ form.reciver.label }}
+            {{ form.reciver(class="form-control") }}
+        </div>
+        <div class="mb-3 iescpe-form-field">
+            {{ form.campaign.label }}
+            {{ form.campaign(class="form-control") }}
+        </div>
+        <div class="d-grid gap-2 iescpe-form-field" id="campaign-form-submit">
+            {{ form.submit(class = "btn btn-1") }}
+        </div>
+    </form>
+    <hr>
+    <h3 class="form-heading">Ad Requests</h3>
+
+    <!--  -->
+    <div class="table-responsive">
+        <table class="table table-striped table-sm">
+            <thead>
+                <tr>
+                    <th scope="col">Sender</th>
+                    <th scope="col">Reciver</th>
+                    <th scope="col">Campaign</th>
+                    <th scope="col">Budget</th>
+                    <th scope="col">Flag</th>
+                    <th scope="col">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if requests %}
+                {% for request in requests %}
+                <tr>
+                    <td>
+                        <a href="{{ url_for('profile', user=request.sent_by_user.id ) }}">{{ request.sent_by_user.fullname }}</a>
+                    </td>
+                    <td>
+                        <a href="{{ url_for('profile', user=request.sent_to_user.id ) }}">{{ request.sent_to_user.fullname }}</a>
+                    </td>
+                    <td>
+                        <a href="{{ url_for('view_campaign', campaign=request.campaign.id ) }}">{{ request.campaign.name }}</a>
+                    </td>
+                    <td>
+                        {{ request.payment_amount }}
+                    </td>
+                    <td>
+                        {% if request.flagged == 1 %}
+                        <span class="flag">Flagged Inappropriate</span>
+                        {% endif %}
+                    </td>
+                    {% if request.flagged == 0 %}
+                    <td>
+                        <a href="{{ url_for('flag_requests', request=request.id ) }}">Flag Inappropriate</a> | 
+                        <a href="{{ url_for('del_req', req=request.id ) }}">Delete</a>
+                    </td>
+                    {% elif request.flagged == 1 %}
+                    <td>
+                        <a href="{{ url_for('unflag_requests', request=request.id ) }}">Unflag</a> | 
+                        <a href="{{ url_for('del_req', req=request.id ) }}">Delete</a>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="9">No campaigns available.</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+    <!--  -->
+</div>
+{% endblock %}

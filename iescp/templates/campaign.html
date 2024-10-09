@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Campaigns - IESCPE
+{% endblock %}
+
+{% block dashboard_nav %}
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <i>Find</i>
+    </a>
+    <ul class="dropdown-menu">
+        <li>
+            <a href="{{ url_for('find_sponsors') }}" class="dropdown-item">Sponsors</a>
+        </li>
+        <li>
+            <a href="{{ url_for('find_influencer') }}" class="dropdown-item">Influencers</a>
+        </li>
+        <li>
+            <a href="{{ url_for('find_campaign') }}" class="dropdown-item">Campaigns</a>
+        </li>
+        {% if current_user.user_type == 0 %}
+        <li>
+            <a href="{{ url_for('find_ad_request') }}" class="dropdown-item">AD Requests</a>
+        </li>
+        {% endif %}
+    </ul>
+</li>
+{% if current_user.user_type == 2 %}
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('campaign_page') }}">Campaigns</a>
+</li>
+{% endif %}
+{% if current_user.user_type != 0 %}
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('stats') }}">Stats</a>
+</li>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="form shadow add-campaign">
+    <h3 class="form-heading">Create new campaign</h3>
+    <form method="POST" id="login-form">
+        {{ form.hidden_tag() }}
+        <div class="mb-3 iescpe-form-field">
+            {{ form.name.label }}
+            {{ form.name(class="form-control", placeholder="Campaign Name") }}
+        </div>
+        <div class="mb-3 iescpe-form-field">
+            {{ form.description.label }}
+            {{ form.description(class="form-control", placeholder="Campaign Description") }}
+        </div>
+        <div class="mb-3 iescpe-form-field">
+            {{ form.start_date.label }}
+            {{ form.start_date(class="form-control", placeholder="Campaign Start Date") }}
+        </div>
+        <div class="mb-3 iescpe-form-field">
+            {{ form.end_date.label }}
+            {{ form.end_date(class="form-control", placeholder="Campaign End Date") }}
+        </div>
+        <div class="mb-3 iescpe-form-visibility">
+            {{ form.visibility.label }}
+            {{ form.visibility(class="form-control", placeholder="Visibility") }}
+        </div>
+        <div class="d-grid gap-2 iescpe-form-field" id="campaign-form-submit">
+            {{ form.submit(class = "btn btn-1") }}
+        </div>
+    </form>
+
+    <br>
+    <hr>
+    <h1 class="h2 form-heading">Campaigns Created</h1>
+    <div class="table-responsive">
+        <table class="table table-striped table-sm">
+            <thead>
+                <tr>
+                    <!-- <th scope="col">Sl no.</th> -->
+                    <th scope="col">Campaign</th>
+                    <th scope="col">Discription</th>
+                    <th scope="col">Start Date</th>
+                    <th scope="col">End Date</th>
+                    <th scope="col">Budget</th>
+                    <th scope="col">Visibility</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Assigned to</th>
+                    <th scope="col">Flag</th>
+                    <th scope="col">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% set campaigns = current_user.get_campaign() %}
+                {% if campaigns %}
+                {% for campaign in campaigns %}
+                <tr>
+                    <td>
+                        <a href="{{ url_for('view_campaign', campaign=campaign.id) }}">{{ campaign.name }}</a>
+                    </td>
+                    <td>{{ campaign.description }}</td>
+                    <td>{{ campaign.start_date }}</td>
+                    <td>{{ campaign.end_date }}</td>
+                    <td>{{ campaign.budget }}</td>
+                    <td>
+                        {% if campaign.visibility == 0 %}
+                        Public
+                        {% else %}
+                        Private
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if campaign.status == 0 %}
+                        Not Started
+                        {% elif campaign.status == 1 %}
+                        In Progress
+                        {% else %}
+                        Closed
+                        {% endif %}
+                    </td>
+                    <td>{{ campaign.assigned_to }}</td>
+                    <td>
+                        {% if campaign.flagged == 1 %}
+                        <span class="flag">Flagged Inappropriate</span>
+                        {% endif %}
+                    </td>
+                    <td> <a href="{{ url_for('send_ad_request_page', campaign=campaign.id ) }}">Send Ad request</a> | <a
+                            href="{{ url_for('edit_campaign_page', campaign=campaign.id ) }}">Edit</a> | <a
+                            href="{{ url_for('delete_campaign', campaign=campaign.id) }}">Delete</a> </td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="9">No campaigns available.</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
