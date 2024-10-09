@@ -28,9 +28,7 @@ python3 -m venv .venv
 ```bash
 py -3 -m venv .venv
 ```
-Produat Engineer
 
-Product Engineer
 ### Activate the virtual environment
 #### for macOS/Linux
 ```bash
